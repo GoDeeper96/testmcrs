@@ -1,0 +1,64 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div id="ContenedorDossier">
+    </div>
+    <script type="text/javascript" src="http://170.231.81.171:8080/MicroStrategyLibrary/javascript/embeddinglib.js"></script>
+    <script>
+        // Parametros de configuracion
+        var baseRestURL = "http://170.231.81.171:8080/MicroStrategyLibrary"; 
+        var projectID = "EEF4598649E5E20D3C59E4AF16B5CCE2"; 
+        var dossierID = "603EF3064C98EF41983AF19E9DE66A36"; 
+        var username = "iraula.j"; 
+        var password = "sistemas"; 
+        /* Generamos la URL completa del Dossier */
+        var URLDossier = baseRestURL + '/app/' + projectID + '/' + dossierID;
+        /* Rellenamos el DIV con el dossier: */
+        microstrategy.dossier.create({
+            /* ContenedorDossier es el ID del DIV donde vamos a colocar el dossier */
+            placeholder: document.getElementById("ContenedorDossier"),
+            url: URLDossier,
+            /* Parametros que definen la apariencia del Dossier */
+            disableNotification: true,
+            enableResponsive: true,
+            /* Parametros de autentificacion */
+             enableCustomAuthentication: true,
+             customAuthenticationType: microstrategy.dossier.CustomAuthenticationType.AUTH_TOKEN,
+             getLoginToken: login
+        }).then(function(dossier) {
+            /* Codigo a ejecutar después de que el Dossier haya terminado de cargarse */
+        });
+        function login() {
+            
+            /* Parametros para la solicitud del login */
+            var options = {
+                method: 'POST',
+                credentials: 'include', /* incluir cookie */
+                mode: 'cors', 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    "loginMode": 1, 
+                    "username": username,
+                    "password": password
+                })
+            };
+            /* El inicio de sesion se realiza aqui */
+            return fetch(baseRestURL + '/api/auth/login', options).then(function (response) {
+                if (response.ok) {
+                return response.headers.get('x-mstr-authToken');
+                } else {
+                response.json().then(function(json) {
+                    console.log(json);
+                });
+                }
+            }).catch(function (error) {
+                console.log(error);
+            });
+        };
+        </script>
+</body>
+</html>
